@@ -38,7 +38,7 @@ function load(type, list, crap_cfg, callback) {
     var source = url.parse(cfg.source || crap.resolve(type, name));
     var protocol = source.protocol || "file";
     var loaders = crap_cfg.loaders || crap.loaders;
-    var loader = loaders[protocol];
+    var loader = loaders[protocol.replace(/:$/,'')];
     if(!loader)
       throw Error('Unknown protocol: "'+ source.protocol+'"');
 
