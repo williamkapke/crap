@@ -36,11 +36,10 @@ function load(type, list, crap_cfg, callback) {
     var cfg = (crap_cfg[type] && crap_cfg[type][name]) || {};
 
     var source = url.parse(cfg.source || crap.resolve(type, name));
-    var protocol = source.protocol || "file";
-    var loaders = crap_cfg.loaders || crap.loaders;
-    var loader = loaders[protocol.replace(/:$/,'')];
+    var protocol = (source.protocol || "file:").replace(/:$/,'');
+    var loader = (crap_cfg.loaders && crap_cfg.loaders[protocol]) || crap.loaders[protocol];
     if(!loader)
-      throw Error('Unknown protocol: "'+ source.protocol+'"');
+      throw Error('Unknown protocol: "'+ protocol+'"');
 
     tasks[name] = loader(cfg, root, source);
   });
