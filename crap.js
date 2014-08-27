@@ -1,12 +1,15 @@
 var async = require("async");
 var url = require("url");
 var path = require("path");
+var fs = require("fs");
+var root = path.dirname(require.main.filename);
 
-
-module.exports = {
+var crap = module.exports = {
+  get config() {
+    var filename = root + '/crap.config.js';
+    return (fs.existsSync(filename) && require(filename)) || {};
+  },
   controllers: {
-//    directory: './controllers',
-//    pattern: /^(.+)Controller/,
     load: load.bind(this, "controllers")
   },
   providers: {
@@ -14,28 +17,38 @@ module.exports = {
   },
   resources: {
     load: load.bind(this, "resources")
+  },
+  resolve: function(type, name) {
+    return root + '/' + type + '/' + name;
+  },
+  loaders: {
+    file: function(cfg, root, source) {
+      var pathname = path.resolve(root, source.pathname);
+      return function(cb) {
+        require(pathname)(cfg, cb);
+      }
+    }
   }
 };
 
 
 function load(type, list, crap_cfg, callback) {
+  callback = arguments[arguments.length-1];
+  if(callback===crap_cfg)
+    crap_cfg = crap.config || { root: root };
+
   var tasks = {};
-  var root = crap_cfg.root || path.dirname(require.main.filename);
+  var root = crap_cfg.root || root;
 
   list && list.split(',').forEach(function(name) {
-    console.log('›››', name, type);
-    if(!crap_cfg[type]) throw new Error('config member missing: crap_cfg["'+type+'"]' );
-    var cfg = crap_cfg[type][name];
-    if(!cfg) throw new Error('config member missing: crap_cfg["'+type+'"]["'+name+'"]' );
-    var source = url.parse(cfg.source);
-    if(!source.protocol || source.protocol==="file"){
-      tasks[name] = function(cb) {
-        var initializer = require(path.resolve(root, source.pathname));
-        initializer(cfg, cb);
-      };
-      return;
-    }
-    throw Error('Unknown protocol: "'+ source.protocol+'"');
+    var cfg = (crap_cfg[type] && crap_cfg[type][name]) || {};
+
+    var source = url.parse(cfg.source || crap.resolve(type, name));
+    var loader = crap.loaders[source.protocol || "file"];
+    if(!loader)
+      throw Error('Unknown protocol: "'+ source.protocol+'"');
+
+    tasks[name] = loader(cfg, root, source);
   });
 
   async.parallel(tasks, function(err, results) {
