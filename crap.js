@@ -28,7 +28,8 @@ var crap = module.exports = {
         require(pathname)(cfg, cb);
       }
     }
-  }
+  },
+  load: load
 };
 
 
