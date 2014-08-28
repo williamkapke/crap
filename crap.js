@@ -32,7 +32,7 @@ function load(type, list, crap_cfg, callback) {
   var tasks = {};
   var root = crap_cfg.root || project_root;
 
-  list && list.split(',').forEach(function(name) {
+  list && array(list).forEach(function(name) {
     var cfg = (crap_cfg[type] && crap_cfg[type][name]) || {};
 
     var source = url.parse(cfg.source || crap.resolve(type, name));
@@ -47,6 +47,12 @@ function load(type, list, crap_cfg, callback) {
   async.parallel(tasks, function(err, results) {
     callback(err, results);
   });
+}
+function array(list) {
+  if(Array.isArray(list))
+    return list;
+
+  return list.split(',');
 }
 
 load.controllers = load.bind(this, "controllers");
