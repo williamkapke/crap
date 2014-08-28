@@ -26,7 +26,7 @@ var crap = module.exports = {
 
 function load(type, list, crap_cfg, callback) {
   callback = arguments[arguments.length-1];
-  if(callback===crap_cfg)
+  if(!crap_cfg || callback===crap_cfg)
     crap_cfg = crap.config || { root: project_root };
 
   var tasks = {};
