@@ -13,10 +13,11 @@ var crap = module.exports = {
     return project_root + '/' + type + '/' + name;
   },
   loaders: {
-    file: function(cfg, root, source) {
+    file: function(crap_cfg, type, name, source) {
+      var root = crap_cfg.root || project_root;
       var pathname = path.resolve(root, source.pathname);
       return function(cb) {
-        require(pathname)(cfg, cb);
+        require(pathname)(crap_cfg, type, name, cb);
       }
     }
   },
@@ -41,7 +42,7 @@ function load(type, list, crap_cfg, callback) {
     if(!loader)
       throw Error('Unknown protocol: "'+ protocol+'"');
 
-    tasks[name] = loader(cfg, root, source);
+    tasks[name] = loader(crap_cfg, type, name, source);
   });
 
   async.parallel(tasks, function(err, results) {
