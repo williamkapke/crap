@@ -6,16 +6,19 @@ var project_root = path.dirname(require.main.filename);
 
 var crap = module.exports = {
   get config() {
-    var filename = project_root + '/crap.config.js';
-    return (fs.existsSync(filename) && require(filename)) || {};
+    return crap.open(project_root + '/crap.config.js');
+  },
+  open: function(filename) {
+    filename = path.resolve(project_root, filename);
+    var exists = fs.existsSync(filename);
+    return (exists && require(filename)) || {};
   },
   resolve: function(type, name) {
     return project_root + '/' + type + '/' + name;
   },
   loaders: {
     file: function(crap_cfg, type, name, source) {
-      var root = crap_cfg.root || project_root;
-      var pathname = path.resolve(root, source.pathname);
+      var pathname = path.resolve(crap_cfg.root, source.pathname);
       return function(cb) {
         require(pathname)(crap_cfg, type, name, cb);
       }
@@ -38,11 +41,14 @@ function load(type, list, crap_cfg, callback) {
 
     var source = url.parse(cfg.source || crap.resolve(type, name));
     var protocol = (source.protocol || "file:").replace(/:$/,'');
-    var loader = (crap_cfg.loaders && crap_cfg.loaders[protocol]) || crap.loaders[protocol];
+    if(!cfg.root) cfg.root = root;
+
+    var loader = (cfg.loaders && cfg.loaders[protocol]) || (crap.loaders && crap.loaders[protocol]);
+
     if(!loader)
       throw Error('Unknown protocol: "'+ protocol+'"');
 
-    tasks[name] = loader(crap_cfg, type, name, source);
+    tasks[name] = loader(cfg, type, name, source);
   });
 
   async.parallel(tasks, function(err, results) {
