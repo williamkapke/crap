@@ -1,11 +1,16 @@
 var crap = require('../../');
 
 
-module.exports = function(crap_cfg, type, name, callback){
+module.exports = function(dependencies, callback){
   console.log("account controller initializing...");
-
-  crap.load.providers("account", crap_cfg, function(err, providers) {
-    callback(null, providers);
-  });
+  callback(null, dependencies);
 };
 
+//or ...
+
+//module.exports = function(callback){
+//  console.log("account controller initializing...");
+//  this.load.providers(function(err, providers) {
+//    callback(null, providers);
+//  });
+//};

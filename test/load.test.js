@@ -1,8 +1,10 @@
 var crap = require("../");
+var config = crap.open("./crap.verbose.config.js");
 
-
-crap.load.controllers('account', function(err, controllers) {
+crap.load.controllers(config, function(err, controllers) {
   console.log('done..');
-  console.log(controllers);
+  console.log(
+    JSON.stringify(controllers, null, 2)
+  );
 });
 

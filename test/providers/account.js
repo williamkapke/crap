@@ -1,10 +1,7 @@
 var crap = require('../../');
 
-module.exports = function(crap_cfg, type, name, callback){
+module.exports = function(dependencies, callback){
   console.log("account provider initializing...");
-
-  crap.load.resources("users", crap_cfg, function(err, resources) {
-    callback(null, resources);
-  });
+  callback(null, dependencies);
 };
 

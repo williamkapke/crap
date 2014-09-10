@@ -47,7 +47,9 @@ var cfg = module.exports = {
       source: "./resources/users.js"
     },
     facebook: {
-      settings: {},
+      settings: {
+        api_key: "nasvdasodino4in0v8n302n3inc09"
+      },
       source: "./resources/facebook.js"
     },
     session: {
