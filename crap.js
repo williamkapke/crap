@@ -27,6 +27,13 @@ var crap = module.exports = {
   load: load
 };
 
+function get_loader(protocol) {
+  for (var i=1; i<arguments.length; i++) {
+    var obj = arguments[i];
+    var loader = obj.loaders && obj.loaders[protocol];
+    if(loader) return loader;
+  }
+}
 
 function load(type, list, crap_cfg, callback) {
   callback = arguments[arguments.length-1];
@@ -43,7 +50,7 @@ function load(type, list, crap_cfg, callback) {
     var protocol = (source.protocol || "file:").replace(/:$/,'');
     if(!cfg.root) cfg.root = root;
 
-    var loader = (cfg.loaders && cfg.loaders[protocol]) || (crap.loaders && crap.loaders[protocol]);
+    var loader = get_loader(protocol, cfg, crap.config, crap);
 
     if(!loader)
       throw Error('Unknown protocol: "'+ protocol+'"');
