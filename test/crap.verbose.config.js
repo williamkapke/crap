@@ -44,7 +44,7 @@ var cfg = module.exports = {
   resources: {
     users: {
       settings: {},
-      source: "./resources/users.js"
+      source: "./resources/mongo.js?collection#users"
     },
     facebook: {
       settings: {

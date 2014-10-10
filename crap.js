@@ -19,9 +19,19 @@ var crap = module.exports = {
   loaders: {
     file: function(crap_cfg, type, name, source) {
       var pathname = path.resolve(crap_cfg.root, source.pathname);
+      var query = source.query;
+      var hash = source.hash && source.hash.substr(1);
 
       return function(cb) {
         var builder = require(pathname);
+        var args = hash? hash.split(',') : [];
+        args.push(cb);
+
+        if(query) {
+          builder = builder[query];
+          if(typeof builder !== "function")
+            throw new Error("Cannot execute property: name='"+query+"', type='"+(typeof builder)+"', file='"+pathname+"'");
+        }
         var ctx = {
           config: crap_cfg,
           type: type,
@@ -29,7 +39,7 @@ var crap = module.exports = {
         };
         ctx.load = bind_helpers(ctx);
         if(builder.length===1)
-          return builder.call(ctx, cb);
+          return builder.apply(ctx, args);
 
         //auto load; infer dependencies from config
         var tasks = {};
@@ -40,8 +50,9 @@ var crap = module.exports = {
             tasks[type] = load.bind(ctx, type, keys, crap_cfg);
         });
         async.parallel(tasks, function(err, results) {
-          if(err) callback(err);
-          else builder.call(ctx, results, cb);
+          if(err) return callback(err);
+          args.unshift(results);
+          builder.apply(ctx, args);
         });
       }
     }
