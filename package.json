@@ -1,6 +1,6 @@
 {
   "name": "crap",
-  "version": "3.1.0",
+  "version": "3.2.0",
   "description": "Ⓒontrollers Ⓡesources Ⓐnd ⓟroviders framework",
   "homepage": "https://github.com/williamwicks/crap",
   "main": "crap.js",
@@ -21,6 +21,7 @@
     "should": "^4.0.4"
   },
   "dependencies": {
-    "async": "^0.9.0"
+    "async": "^0.9.0",
+    "debug": "^2.0.0"
   }
 }

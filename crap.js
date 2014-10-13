@@ -2,19 +2,27 @@ var async = require("async");
 var url = require("url");
 var path = require("path");
 var fs = require("fs");
-var project_root = path.dirname(require.main.filename);
+var debug = require("debug")("crap");
+var cache = {};
 
 var crap = module.exports = {
+  root: process.cwd(),
   get config() {
-    return crap.open(project_root + '/crap.config.js');
+    var p = crap.root + '/crap.config.js';
+    return crap.open(p);
   },
   open: function(filename) {
-    filename = path.resolve(project_root, filename);
-    var exists = fs.existsSync(filename);
-    return (exists && require(filename)) || {};
+    var result = cache[filename];
+    if(!result) {
+      filename = path.resolve(crap.root, filename);
+      var exists = fs.existsSync(filename);
+      if(debug.enabled) debug("opening.. "+filename);
+      result = cache[filename] = (exists && require(filename)) || {};
+    }
+    return result;
   },
   resolve: function(type, name) {
-    return project_root + '/' + type + '/' + name;
+    return crap.root + '/' + type + '/' + name;
   },
   loaders: {
     file: function(crap_cfg, type, name, source) {
@@ -23,6 +31,7 @@ var crap = module.exports = {
       var hash = source.hash && source.hash.substr(1);
 
       return function(cb) {
+        if(debug.enabled) debug("using builder: " + pathname);
         var builder = require(pathname);
         var args = hash? hash.split(',') : [];
         args.push(cb);
@@ -43,11 +52,14 @@ var crap = module.exports = {
 
         //auto load; infer dependencies from config
         var tasks = {};
+        if(debug.enabled) debug("inferring dependencies from config:");
         ["controllers","providers","resources"].forEach(function(type) {
           var cfg = crap_cfg[type];
           var keys = cfg && Object.keys(cfg);
-          if(keys && keys.length)
+          if(keys && keys.length){
             tasks[type] = load.bind(ctx, type, keys, crap_cfg);
+            if(debug.enabled) debug("\t"+type+": " + keys);
+          }
         });
         async.parallel(tasks, function(err, results) {
           if(err) return callback(err);
@@ -90,12 +102,13 @@ function load(type) {
     default:
       throw new Error("unknown signature: "+ signature);
   }
-  if(!crap_cfg) crap_cfg = this.config || { root: project_root };
+  if(!crap_cfg) crap_cfg = this.config || { root: crap.root };
   if(!list) list = crap_cfg[type]? Object.keys(crap_cfg[type]) : [];
 
   var tasks = {};
-  var root = crap_cfg.root || project_root;
+  var root = crap_cfg.root || crap.root;
 
+  if(debug.enabled) debug("loading "+type+": " +list.join());
   list.forEach(function(name) {
     var cfg = (crap_cfg[type] && crap_cfg[type][name]) || {};
 
@@ -109,7 +122,10 @@ function load(type) {
     tasks[name] = loader(cfg, type, name, source);
   });
 
-  async.parallel(tasks, callback);
+  async.parallel(tasks, function(err, result) {
+    if(debug.enabled) debug("...done loading "+type+": "+list.join());
+    callback(err, result);
+  });
 }
 function array(list) {
   if(Array.isArray(list))
