@@ -1,5 +1,5 @@
 var crap = require("../");
-var config = crap.open("./crap.verbose.config.js");
+var config = require("./crap.verbose.config.js");
 
 crap.load.controllers(config, function(err, controllers) {
   console.log('done..');

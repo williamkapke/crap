@@ -1,6 +1,5 @@
-var crap = require('../../');
 
-module.exports = function(dependencies, callback){
+module.exports = function auto(dependencies, callback){
   console.log("session provider initializing...");
   callback(null, dependencies);
 };

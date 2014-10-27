@@ -1,7 +1,6 @@
-var crap = require('../../');
 
 
-module.exports = function(dependencies, callback){
+module.exports = function auto(dependencies, callback){
   callback(null, dependencies);
 };
 

@@ -47,7 +47,7 @@ var crap = module.exports = {
           name: name
         };
         ctx.load = bind_helpers(ctx);
-        if(builder.length===1)
+        if(builder.name !== "auto" && !builder.__auto)
           return builder.apply(ctx, args);
 
         //auto load; infer dependencies from config
@@ -136,8 +136,8 @@ function array(list) {
 
 function bind_helpers(ctx){
   var l = load.bind(ctx);
-  l.controllers = l.bind(ctx, "controllers");
-  l.providers = l.bind(ctx, "providers");
-  l.resources = l.bind(ctx, "resources");
+  l.controllers = load.bind(ctx, "controllers");
+  l.providers = load.bind(ctx, "providers");
+  l.resources = load.bind(ctx, "resources");
   return l;
 }
