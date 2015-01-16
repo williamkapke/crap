@@ -62,7 +62,7 @@ var crap = module.exports = {
           }
         });
         async.parallel(tasks, function(err, results) {
-          if(err) return callback(err);
+          if(err) return cb(err);
           args.unshift(results);
           builder.apply(ctx, args);
         });
@@ -123,7 +123,10 @@ function load(type) {
   });
 
   async.parallel(tasks, function(err, result) {
-    if(debug.enabled) debug("...done loading "+type+": "+list.join());
+    if(debug.enabled) {
+      if (err) debug("failed to load "+type+": "+list.join());
+      else debug("...done loading "+type+": "+list.join());
+    }
     callback(err, result);
   });
 }
