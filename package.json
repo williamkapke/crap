@@ -1,20 +1,20 @@
 {
   "name": "crap",
-  "version": "4.0.1",
+  "version": "4.0.2",
   "description": "Ⓒontrollers Ⓡesources Ⓐnd ⓟroviders framework",
-  "homepage": "https://github.com/williamwicks/crap",
+  "homepage": "https://github.com/williamkapke/crap",
   "main": "crap.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/williamwicks/controller-provider-source.git"
+    "url": "https://github.com/williamkapke/controller-provider-source.git"
   },
-  "author": "William Wicks",
+  "author": "William Kapke",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/williamwicks/controller-provider-source/issues"
+    "url": "https://github.com/williamkapke/controller-provider-source/issues"
   },
   "devDependencies": {
     "mocha": "^1.13.0",
