@@ -53,7 +53,7 @@ var crap = module.exports = {
         //auto load; infer dependencies from config
         var tasks = {};
         if(debug.enabled) debug("inferring dependencies from config:");
-        ["controllers","providers","resources"].forEach(function(type) {
+        ["apps","middleware","controllers","providers","resources"].forEach(function(type) {
           var cfg = crap_cfg[type];
           var keys = cfg && Object.keys(cfg);
           if(keys && keys.length){
@@ -139,6 +139,8 @@ function array(list) {
 
 function bind_helpers(ctx){
   var l = load.bind(ctx);
+  l.apps = load.bind(ctx, "apps");
+  l.middleware = load.bind(ctx, "middleware");
   l.controllers = load.bind(ctx, "controllers");
   l.providers = load.bind(ctx, "providers");
   l.resources = load.bind(ctx, "resources");

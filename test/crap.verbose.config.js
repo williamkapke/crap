@@ -2,6 +2,30 @@
 
 var cfg = module.exports = {
   root: __dirname,
+
+  apps: {
+    profile: {
+      settings: {},
+      source: "./apps/profile.js",
+      middleware: {
+        get auth() { return cfg.middleware.auth; }
+      },
+      controllers: {
+        get account() { return cfg.controllers.account }
+      }
+    }
+  },
+
+  middleware: {
+    auth: {
+      settings:{},
+      source: "./middleware/auth.js",
+      controllers: {
+        get session() { return cfg.controllers.session; }
+      }
+    }
+  },
+
   //business logic
   controllers: {
     account: {
