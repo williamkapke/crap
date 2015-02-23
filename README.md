@@ -127,7 +127,7 @@ If modules is a string, `modules = modules.split(',')`
 
 **crap.load.controllers()**
 **crap.load.providers()**
-**crap.load.apps()**
+**crap.load.resources()**
 ___
 Same as the load functions with the respective type.
 
