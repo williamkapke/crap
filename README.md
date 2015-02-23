@@ -115,18 +115,20 @@ Load all modules of the given type that are found in the given config
 
 **crap.load(type:string, modules:array|string, callback:function)**
 ___
-Load the given modules of the given type found in `crap.config`
+Load the given modules of the given type found in `crap.config`.
 If modules is a string, `modules = modules.split(',')`
 
 **crap.load(type:string, modules:array|string, config:object, callback:function)**
 ___
-Load the given modules of the given type found in the given config
+Load the given modules of the given type found in the given config.
 If modules is a string, `modules = modules.split(',')`
 
 ### Helper functions
 
 **crap.load.controllers()**
+
 **crap.load.providers()**
+
 **crap.load.resources()**
 ___
 Same as the load functions with the respective type.
