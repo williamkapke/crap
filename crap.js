@@ -21,8 +21,8 @@ var crap = module.exports = {
     }
     return result;
   },
-  resolve: function(type, name) {
-    return crap.root + '/' + type + '/' + name;
+  resolve: function(root, type, name) {
+    return root + '/' + type + '/' + name;
   },
   loaders: {
     file: function(crap_cfg, type, name, source) {
@@ -112,7 +112,7 @@ function load(type) {
   list.forEach(function(name) {
     var cfg = (crap_cfg[type] && crap_cfg[type][name]) || {};
 
-    var source = url.parse(cfg.source || crap.resolve(type, name));
+    var source = url.parse(cfg.source || crap.resolve(cfg.root || root, type, name));
     var protocol = (source.protocol || "file:").replace(/:$/,'');
     if(!cfg.root) cfg.root = root;
 
