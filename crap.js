@@ -1,4 +1,4 @@
-var async = require("async");
+var parallel = require('./parallel.js');
 var url = require("url");
 var path = require("path");
 var fs = require("fs");
@@ -61,10 +61,12 @@ var crap = module.exports = {
             if(debug.enabled) debug("\t"+type+": " + keys);
           }
         });
-        async.parallel(tasks, function(err, results) {
+        parallel(tasks, function(err, results) {
           if(err) return cb(err);
           args.unshift(results);
-          builder.apply(ctx, args);
+          var return_value = builder.apply(ctx, args);
+          if(return_value && typeof return_value.then === "function")
+            return_value.then(cb.bind(null, null), cb);
         });
       }
     }
@@ -122,7 +124,7 @@ function load(type) {
     tasks[name] = loader(cfg, type, name, source);
   });
 
-  async.parallel(tasks, function(err, result) {
+  parallel(tasks, function(err, result) {
     if(debug.enabled) {
       if (err) debug("failed to load "+type+": "+list.join());
       else debug("...done loading "+type+": "+list.join());
