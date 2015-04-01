@@ -1,4 +1,4 @@
-var async = require("async");
+var parallel = require('./parallel.js');
 var url = require("url");
 var path = require("path");
 var fs = require("fs");
@@ -21,8 +21,8 @@ var crap = module.exports = {
     }
     return result;
   },
-  resolve: function(type, name) {
-    return crap.root + '/' + type + '/' + name;
+  resolve: function(root, type, name) {
+    return root + '/' + type + '/' + name;
   },
   loaders: {
     file: function(crap_cfg, type, name, source) {
@@ -61,10 +61,12 @@ var crap = module.exports = {
             if(debug.enabled) debug("\t"+type+": " + keys);
           }
         });
-        async.parallel(tasks, function(err, results) {
+        parallel(tasks, function(err, results) {
           if(err) return cb(err);
           args.unshift(results);
-          builder.apply(ctx, args);
+          var return_value = builder.apply(ctx, args);
+          if(return_value && typeof return_value.then === "function")
+            return_value.then(cb.bind(null, null), cb);
         });
       }
     }
@@ -82,21 +84,28 @@ function get_loader(protocol) {
 
 function load(type) {
   var list,crap_cfg,callback = arguments[arguments.length-1];
+  if(typeof callback!=='function') callback = undefined;
   var signature = Array.prototype.map.call(arguments, function(arg){ return Array.isArray(arg)? "array" : typeof arg }).join();
 
   switch(signature) {
+    case "string,string,object":
     case "string,string,object,function":
+    case "string,array,object":
     case "string,array,object,function":
       list = array(arguments[1]);
       crap_cfg = arguments[2];
       break;
+    case "string,array":
     case "string,array,function":
+    case "string,string":
     case "string,string,function":
       list = array(arguments[1]);
       break;
+    case "string,object":
     case "string,object,function":
       crap_cfg = arguments[1];
       break;
+    case "string":
     case "string,function":
       break;
     default:
@@ -112,7 +121,7 @@ function load(type) {
   list.forEach(function(name) {
     var cfg = (crap_cfg[type] && crap_cfg[type][name]) || {};
 
-    var source = url.parse(cfg.source || crap.resolve(type, name));
+    var source = url.parse(cfg.source || crap.resolve(cfg.root || root, type, name));
     var protocol = (source.protocol || "file:").replace(/:$/,'');
     if(!cfg.root) cfg.root = root;
 
@@ -122,12 +131,12 @@ function load(type) {
     tasks[name] = loader(cfg, type, name, source);
   });
 
-  async.parallel(tasks, function(err, result) {
+  return parallel(tasks, function(err, result) {
     if(debug.enabled) {
       if (err) debug("failed to load "+type+": "+list.join());
       else debug("...done loading "+type+": "+list.join());
     }
-    callback(err, result);
+    callback && callback(err, result);
   });
 }
 function array(list) {
