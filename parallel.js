@@ -38,7 +38,7 @@ module.exports = function parallel(tasks, done) {
     function fail(err) {
       if(failed) return;
       failed = true;
-      if(reject) reject(results);
+      if(reject) reject(err);
       if(done) done(err);
     }
   }
