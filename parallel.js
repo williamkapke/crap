@@ -25,6 +25,7 @@ module.exports = function parallel(tasks, done) {
       else success.call(this, result);
     }
     function success(result){
+      if(failed) return;
       num_complete++;
       var name = this; //cause we did .bind(name) above
       results[name] = result;
