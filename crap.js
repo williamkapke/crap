@@ -84,21 +84,28 @@ function get_loader(protocol) {
 
 function load(type) {
   var list,crap_cfg,callback = arguments[arguments.length-1];
+  if(typeof callback!=='function') callback = undefined;
   var signature = Array.prototype.map.call(arguments, function(arg){ return Array.isArray(arg)? "array" : typeof arg }).join();
 
   switch(signature) {
+    case "string,string,object":
     case "string,string,object,function":
+    case "string,array,object":
     case "string,array,object,function":
       list = array(arguments[1]);
       crap_cfg = arguments[2];
       break;
+    case "string,array":
     case "string,array,function":
+    case "string,string":
     case "string,string,function":
       list = array(arguments[1]);
       break;
+    case "string,object":
     case "string,object,function":
       crap_cfg = arguments[1];
       break;
+    case "string":
     case "string,function":
       break;
     default:
@@ -124,12 +131,12 @@ function load(type) {
     tasks[name] = loader(cfg, type, name, source);
   });
 
-  parallel(tasks, function(err, result) {
+  return parallel(tasks, function(err, result) {
     if(debug.enabled) {
       if (err) debug("failed to load "+type+": "+list.join());
       else debug("...done loading "+type+": "+list.join());
     }
-    callback(err, result);
+    callback && callback(err, result);
   });
 }
 function array(list) {

@@ -8,7 +8,7 @@ function task(ms) {
     if(ms<0)
       setTimeout(function () { done("boooo"); }, Math.abs(ms));
     else
-      setTimeout(done, ms);
+      setTimeout(function () { done(null, "OK"); }, ms);
   }
 }
 function tasks() {
@@ -26,7 +26,7 @@ function thenable(ms) {
         if(ms<0)
           setTimeout(function () { reject("boooo"); }, Math.abs(ms));
         else
-          setTimeout(resolve, ms);
+          setTimeout(function () { resolve("OK"); }, ms);
       }
     }
   }
@@ -43,7 +43,7 @@ describe("parallel tests", function () {
   it("should allow callback style (success)", function (done) {
     parallel(tasks(10,500,20,50), function (err, results) {
       (!err).should.be.true;
-      results.should.eql({ t0: undefined, t2: undefined, t3: undefined, t1: undefined });
+      results.should.eql({ t0: 'OK', t1: 'OK', t2: 'OK', t3: 'OK' });
       done();
     });
   });
@@ -57,7 +57,7 @@ describe("parallel tests", function () {
   it("should allow thenable style (success)", function (done) {
     parallel(thenables(10,500,20,50), function (err, results) {
       (!err).should.be.true;
-      results.should.eql({ t0: undefined, t2: undefined, t3: undefined, t1: undefined });
+      results.should.eql({ t0: 'OK', t1: 'OK', t2: 'OK', t3: 'OK' });
       done();
     });
   });
@@ -68,4 +68,16 @@ describe("parallel tests", function () {
       done();
     });
   });
+
+  if(typeof Promise !== 'undefined') {
+    it("should return a Promise", function (done) {
+      var result = parallel(thenables(10, 500, 50));
+      result.should.be.instanceOf(Promise);
+      result.then(function (results) {
+        results.should.eql({ t0: 'OK', t1: 'OK', t2: 'OK' });
+        done();
+      })
+      .catch(done);
+    });
+  }
 });
