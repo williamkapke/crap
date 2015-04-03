@@ -30,16 +30,19 @@ module.exports = function parallel(tasks, done) {
       var name = this; //cause we did .bind(name) above
       results[name] = result;
 
-      if(num_complete===keys.length){
-        if(resolve) resolve(results);
-        if(done) done(null, results);
-      }
+      if(num_complete===keys.length)
+        process.nextTick(function(){
+          if (resolve) resolve(results);
+          if (done) done(null, results);
+        })
     }
     function fail(err) {
       if(failed) return;
       failed = true;
-      if(reject) reject(err);
-      if(done) done(err);
+      process.nextTick(function(){
+        if (reject) reject(err);
+        if (done) done(err);
+      })
     }
   }
 
