@@ -151,6 +151,7 @@ function array(list) {
 function bind_helpers(ctx){
   var l = load.bind(ctx);
   l.apps = load.bind(ctx, "apps");
+  l.apis = load.bind(ctx, "apis");
   l.middleware = load.bind(ctx, "middleware");
   l.controllers = load.bind(ctx, "controllers");
   l.providers = load.bind(ctx, "providers");
