@@ -5,7 +5,7 @@ var fs = require("fs");
 var debug = require("debug")("crap");
 var cache = {};
 
-var types = ["apps","middleware","controllers","providers","resources"];
+var types = ["apis","apps","middleware","controllers","providers","resources"];
 
 var crap = module.exports = {
   root: process.cwd(),
@@ -36,7 +36,9 @@ var crap = module.exports = {
   },
   loaders: {
     file: function(crap_cfg, type, name, source) {
-      var pathname = path.resolve(crap_cfg.root, source.pathname);
+      var pathname = source.pathname;
+      if(/^\.?\.?\//.test(pathname))
+        pathname = path.resolve(crap_cfg.root, source.pathname);
       var query = source.query;
       var hash = source.hash && source.hash.substr(1);
 
