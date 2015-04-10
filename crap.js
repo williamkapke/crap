@@ -5,6 +5,8 @@ var fs = require("fs");
 var debug = require("debug")("crap");
 var cache = {};
 
+var types = ["apis","apps","middleware","controllers","providers","resources"];
+
 var crap = module.exports = {
   root: process.cwd(),
   get config() {
@@ -23,6 +25,14 @@ var crap = module.exports = {
   },
   resolve: function(root, type, name) {
     return root + '/' + type + '/' + name;
+  },
+  support: function(more_types) {
+    more_types = array(more_types);
+    types = types.concat(more_types).filter(unique);
+    crap.load = bind_helpers(crap);
+    function unique(value, index, self) {
+      return self.indexOf(value) === index;
+    }
   },
   loaders: {
     file: function(crap_cfg, type, name, source) {
@@ -55,7 +65,7 @@ var crap = module.exports = {
         //auto load; infer dependencies from config
         var tasks = {};
         if(debug.enabled) debug("inferring dependencies from config:");
-        ["apps","middleware","controllers","providers","resources"].forEach(function(type) {
+        types.forEach(function(type) {
           var cfg = crap_cfg[type];
           var keys = cfg && Object.keys(cfg);
           if(keys && keys.length){
@@ -141,6 +151,7 @@ function load(type) {
     callback && callback(err, result);
   });
 }
+
 function array(list) {
   if(Array.isArray(list))
     return list;
@@ -150,11 +161,8 @@ function array(list) {
 
 function bind_helpers(ctx){
   var l = load.bind(ctx);
-  l.apps = load.bind(ctx, "apps");
-  l.apis = load.bind(ctx, "apis");
-  l.middleware = load.bind(ctx, "middleware");
-  l.controllers = load.bind(ctx, "controllers");
-  l.providers = load.bind(ctx, "providers");
-  l.resources = load.bind(ctx, "resources");
+  types.forEach(function(type) {
+    l[type] = load.bind(ctx, type);
+  });
   return l;
 }
