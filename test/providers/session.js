@@ -1,3 +1,4 @@
+var resources = require('../resources.js');
 
 module.exports = function auto(dependencies, callback){
   console.log("session provider initializing...");
@@ -10,3 +11,11 @@ module.exports = function auto(dependencies, callback){
   };
 };
 
+module.exports.deps = function() {
+  return {
+    resources: {
+      users: resources.users,
+      session: resources.session
+    }
+  }
+}
