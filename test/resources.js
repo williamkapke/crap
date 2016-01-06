@@ -3,6 +3,10 @@ module.exports = {
     settings: {},
     source: "./resources/mongo.js?collection#users"
   },
+  connections: {
+    settings: {},
+    source: "./resources/mongo.js?collection#connections"
+  },
   facebook: {
     settings: {
       api_key: "nasvdasodino4in0v8n302n3inc09"
