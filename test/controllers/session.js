@@ -5,3 +5,11 @@ module.exports = function auto(dependencies, callback){
   callback(null, dependencies);
 };
 
+module.exports.deps = function() {
+  return {
+    source: __filename,
+    providers: {
+      session: require('../providers/session.js').deps()
+    }
+  }
+}
