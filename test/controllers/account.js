@@ -8,7 +8,7 @@ module.exports = function auto(dependencies, callback){
 module.exports.deps = function() {
   return {
     providers: {
-      account: require('../providers/account.js').deps()
+      account: require('../providers/account.js').deps({get:1})
     }
   }
 }
