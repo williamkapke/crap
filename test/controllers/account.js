@@ -5,6 +5,14 @@ module.exports = function auto(dependencies, callback){
   callback(null, dependencies);
 };
 
+module.exports.deps = function() {
+  return {
+    providers: {
+      account: require('../providers/account.js').deps({get:1})
+    }
+  }
+}
+
 //or ...
 
 //module.exports = function(callback){
